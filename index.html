@@ -51,14 +51,14 @@
                 return;
             }
 
-            // Mostrar dominio
-            const dominioTexto = Aproximado: desde x = ${x[0].toFixed(2)} hasta x = ${x[x.length - 1].toFixed(2)} (sin incluir errores);
+            // Mostrar dominio corregido
+            const dominioTexto = `Aproximado: desde x = ${x[0].toFixed(2)} hasta x = ${x[x.length - 1].toFixed(2)} (sin incluir errores)`;
             document.getElementById("dominio").innerText = dominioTexto;
 
-            // Calcular rango
+            // Calcular rango corregido
             const minY = Math.min(...y).toFixed(2);
             const maxY = Math.max(...y).toFixed(2);
-            document.getElementById("rango").innerText = [${minY}, ${maxY}];
+            document.getElementById("rango").innerText = `[${minY}, ${maxY}]`;
 
             // Graficar función válida
             const trazaValida = {
@@ -98,3 +98,4 @@
     </script>
 </body>
 </html>
+ 
