@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gráfica + Dominio y Rango</title>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@10.6.4/lib/browser/math.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h2>Calculadora avanzada de funciones</h2>
+    <p>Ingresa una función (ejemplos: <code>1/(x-2)</code>, <code>sqrt(x)</code>, <code>sin(x)</code>):</p>
+    <input type="text" id="funcion" value="1/(x - 2)" size="40">
+    <button onclick="graficarFuncion()">Graficar</button>
+
+    <h3>Dominio válido (detectado automáticamente):</h3>
+    <p id="dominio"></p>
+
+    <h3>Rango aproximado:</h3>
+    <p id="rango"></p>
+
+    <div id="grafico" style="width: 100%; max-width: 700px; height: 400px;"></div>
+
+    <script>
+        function graficarFuncion() {
+            const expr = document.getElementById('funcion').value;
+            const x = [];
+            const y = [];
+            let minX = Infinity;
+            let maxX = -Infinity;
+
+            for (let i = -100; i <= 100; i += 0.1) {
+                const xi = parseFloat(i.toFixed(2));
+                try {
+                    const yi = math.evaluate(expr, { x: xi });
+
+                    if (isFinite(yi)) {
+                        x.push(xi);
+                        y.push(yi);
+
+                        if (xi < minX) minX = xi;
+                        if (xi > maxX) maxX = xi;
+                    }
+                } catch {
+                    // punto excluido del dominio
+                }
+            }
+
+            if (x.length === 0) {
+                alert("La función no se puede evaluar correctamente. Verifica la sintaxis.");
+                return;
+            }
+
+            // Mostrar dominio real
+            const dominioTexto = Aproximado: desde x = ${x[0].toFixed(2)} hasta x = ${x[x.length - 1].toFixed(2)};
+            document.getElementById("dominio").innerText = dominioTexto;
+
+            // Calcular y mostrar rango
+            const minY = Math.min(...y).toFixed(2);
+            const maxY = Math.max(...y).toFixed(2);
+            document.getElementById("rango").innerText = [${minY}, ${maxY}];
+
+            // Graficar
+            Plotly.newPlot('grafico', [{
+                x: x,
+                y: y,
+                type: 'scatter',
+                mode: 'lines',
+                line: { color: 'blue' }
+            }]);
+        }
+    </script>
+</body>
+</html>
