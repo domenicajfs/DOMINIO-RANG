@@ -2,17 +2,18 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Gráfica + Dominio y Rango</title>
+    <title>Gráfica con Dominio, Rango y Puntos Excluidos</title>
     <script src="https://cdn.jsdelivr.net/npm/mathjs@10.6.4/lib/browser/math.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
-    <h2>Calculadora avanzada de funciones</h2>
-    <p>Ingresa una función (ejemplos: <code>1/(x-2)</code>, <code>sqrt(x)</code>, <code>sin(x)</code>):</p>
-    <input type="text" id="funcion" value="1/(x - 2)" size="40">
+    <h2>Calculadora de funciones con dominio, rango y errores</h2>
+    <p>Ingresa una función (ejemplo: <code>1/(x-2)</code>, <code>sqrt(x)</code>, <code>log(x)</code>):</p>
+    <input type="text" id="funcion" value="1/(x-2)" size="40">
     <button onclick="graficarFuncion()">Graficar</button>
+    <button onclick="descargarGrafica()">Descargar gráfica</button>
 
-    <h3>Dominio válido (detectado automáticamente):</h3>
+    <h3>Dominio válido:</h3>
     <p id="dominio"></p>
 
     <h3>Rango aproximado:</h3>
@@ -25,48 +26,74 @@
             const expr = document.getElementById('funcion').value;
             const x = [];
             const y = [];
-            let minX = Infinity;
-            let maxX = -Infinity;
+            const erroresX = [];
+            const erroresY = [];
 
             for (let i = -100; i <= 100; i += 0.1) {
                 const xi = parseFloat(i.toFixed(2));
                 try {
                     const yi = math.evaluate(expr, { x: xi });
-
                     if (isFinite(yi)) {
                         x.push(xi);
                         y.push(yi);
-
-                        if (xi < minX) minX = xi;
-                        if (xi > maxX) maxX = xi;
+                    } else {
+                        erroresX.push(xi);
+                        erroresY.push(null);
                     }
                 } catch {
-                    // punto excluido del dominio
+                    erroresX.push(xi);
+                    erroresY.push(null);
                 }
             }
 
             if (x.length === 0) {
-                alert("La función no se puede evaluar correctamente. Verifica la sintaxis.");
+                alert("La función no pudo evaluarse. Verifica la sintaxis.");
                 return;
             }
 
-            // Mostrar dominio real
-            const dominioTexto = Aproximado: desde x = ${x[0].toFixed(2)} hasta x = ${x[x.length - 1].toFixed(2)};
+            // Mostrar dominio
+            const dominioTexto = Aproximado: desde x = ${x[0].toFixed(2)} hasta x = ${x[x.length - 1].toFixed(2)} (sin incluir errores);
             document.getElementById("dominio").innerText = dominioTexto;
 
-            // Calcular y mostrar rango
+            // Calcular rango
             const minY = Math.min(...y).toFixed(2);
             const maxY = Math.max(...y).toFixed(2);
             document.getElementById("rango").innerText = [${minY}, ${maxY}];
 
-            // Graficar
-            Plotly.newPlot('grafico', [{
+            // Graficar función válida
+            const trazaValida = {
                 x: x,
                 y: y,
                 type: 'scatter',
                 mode: 'lines',
+                name: 'Función',
                 line: { color: 'blue' }
-            }]);
+            };
+
+            // Graficar puntos donde hay error
+            const trazaErrores = {
+                x: erroresX,
+                y: erroresY,
+                type: 'scatter',
+                mode: 'markers',
+                name: 'Error de dominio',
+                marker: { color: 'red', size: 6 }
+            };
+
+            Plotly.newPlot('grafico', [trazaValida, trazaErrores], {
+                margin: { t: 30 },
+                xaxis: { title: 'x' },
+                yaxis: { title: 'f(x)' }
+            });
+        }
+
+        function descargarGrafica() {
+            Plotly.downloadImage('grafico', {
+                format: 'png',
+                width: 800,
+                height: 600,
+                filename: 'grafica_funcion'
+            });
         }
     </script>
 </body>
